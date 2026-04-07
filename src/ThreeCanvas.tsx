@@ -23,17 +23,24 @@ function Sphere() {
 
     useFrame((_, delta) => {
         uTime.current.value += delta;
+        let mouseTarget = new Vector3();
 
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObject(scene, true);
 
         if (intersects?.length > 0) {
-            mousePosition.current.value = intersects[0].point;
+            mouseTarget = intersects[0].point;
+        }
+
+        if (mouseTarget) {
+            mousePosition.current.value.lerp(mouseTarget, delta * 10);
+        } else {
+            mousePosition.current.value.lerp(new Vector3(0, 0, 0), delta);
         }
     });
     return (
         <mesh>
-            <icosahedronGeometry args={[3.0, 16]} />
+            <icosahedronGeometry args={[3.0, 64]} />
             <shaderMaterial
                 args={[
                     {

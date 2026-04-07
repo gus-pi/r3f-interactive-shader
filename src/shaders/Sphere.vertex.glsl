@@ -89,13 +89,15 @@ varying float vHoverArea;
 
 void main() {
 
-    float noise = pnoise(position + uTime, vec3(10.0));
-    vec3 newPos = position + normal * noise * 0.1;
-
     vHoverArea = distance(uMousePosition, position);
     vHoverArea = vHoverArea / 0.8;
     vHoverArea = clamp(vHoverArea, 0.0, 1.0);
     vHoverArea = 1.0 - vHoverArea;
+
+    float noise = pnoise(position + uTime, vec3(10.0)) * 0.1;
+    float noiseHover = pnoise(position + uTime, vec3(10.0)) * 0.8;
+    float noiseMixed = mix(noise, noiseHover, vHoverArea);
+    vec3 newPos = position + normal * noiseMixed;
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
 }
