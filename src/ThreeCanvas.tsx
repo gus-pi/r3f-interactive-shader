@@ -1,7 +1,8 @@
 import { OrbitControls } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import vertexShader from './shaders/Sphere.vertex.glsl?raw';
 import fragmentShader from './shaders/Sphere.fragment.glsl?raw';
+import { useRef } from 'react';
 
 const ThreeCanvas = () => {
     return (
@@ -15,6 +16,11 @@ const ThreeCanvas = () => {
 export default ThreeCanvas;
 
 function Sphere() {
+    const uTime = useRef({ value: 0.0 });
+
+    useFrame((_, delta) => {
+        uTime.current.value += delta;
+    });
     return (
         <mesh>
             <icosahedronGeometry args={[3.0, 16]} />
@@ -23,6 +29,9 @@ function Sphere() {
                     {
                         vertexShader,
                         fragmentShader,
+                        uniforms: {
+                            uTime: uTime.current,
+                        },
                         wireframe: true,
                     },
                 ]}
