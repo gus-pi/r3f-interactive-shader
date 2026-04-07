@@ -1,8 +1,9 @@
 import { OrbitControls } from '@react-three/drei';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import vertexShader from './shaders/Sphere.vertex.glsl?raw';
 import fragmentShader from './shaders/Sphere.fragment.glsl?raw';
 import { useRef } from 'react';
+import { Vector3 } from 'three';
 
 const ThreeCanvas = () => {
     return (
@@ -17,9 +18,18 @@ export default ThreeCanvas;
 
 function Sphere() {
     const uTime = useRef({ value: 0.0 });
+    const mousePosition = useRef({ value: new Vector3(0, 0 - 5) });
+    const { camera, pointer, raycaster, scene } = useThree();
 
     useFrame((_, delta) => {
         uTime.current.value += delta;
+
+        raycaster.setFromCamera(pointer, camera);
+        const intersects = raycaster.intersectObject(scene, true);
+
+        if (intersects?.length > 0) {
+            mousePosition.current.value = intersects[0].point;
+        }
     });
     return (
         <mesh>
@@ -31,6 +41,7 @@ function Sphere() {
                         fragmentShader,
                         uniforms: {
                             uTime: uTime.current,
+                            uMousePosition: mousePosition.current,
                         },
                         wireframe: true,
                     },
